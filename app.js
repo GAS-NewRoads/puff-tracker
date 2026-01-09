@@ -65,7 +65,9 @@ function setDefaultsIfMissing(){
     cigsPerDay: (Number.isFinite(Number(s.cigsPerDay)) && Number(s.cigsPerDay)>=0) ? Number(s.cigsPerDay) : 15,
     nicStrength: (Number.isFinite(Number(s.nicStrength)) && Number(s.nicStrength)>=0) ? Number(s.nicStrength) : 0,
     mlPerPuff: (Number.isFinite(Number(s.mlPerPuff)) && Number(s.mlPerPuff)>=0) ? Number(s.mlPerPuff) : 0,
-    sheetUrl: (typeof s.sheetUrl==="string") ? s.sheetUrl : ""
+    sheetUrl: (typeof s.sheetUrl === "string" && s.sheetUrl.length)
+  ? s.sheetUrl
+  : "https://https://docs.google.com/spreadsheets/d/1-RygXbJmqH_uPUnKZlOBivUVp2z_XEV7vdVAhzDuOew/edit?gid=1895608508#gid=1895608508"
   };
   saveSettings(merged);
 }

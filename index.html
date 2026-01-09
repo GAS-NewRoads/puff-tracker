@@ -1,1 +1,183 @@
-<!doctype html><html><head><meta charset='utf-8'><title>Puff Tracker</title></head><body><h1>Puff Tracker</h1><script src='app.js'></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Puff Tracker</title>
+
+  <style>
+    :root { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0b0b0b; color: #f3f3f3; -webkit-tap-highlight-color: transparent; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 16px; padding-bottom: 40px; }
+    .topbar { display:flex; align-items:center; gap:10px; margin-bottom: 10px; }
+    h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.2px; }
+    .pill { display:inline-flex; align-items:center; gap:8px; padding: 6px 10px; border-radius: 999px; border:1px solid #2a2a2a; color:#cfcfcf; font-size: 12px; }
+    .dot { width:8px; height:8px; border-radius:999px; background:#4ade80; }
+    .pill.warn .dot { background:#fbbf24; }
+    .pill.danger .dot { background:#f87171; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
+
+    .card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 14px; }
+    .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi { background:#101010; border:1px solid #262626; border-radius:14px; padding: 12px; }
+    .kpi .label { color:#bdbdbd; font-size: 12px; }
+    .kpi .value { font-size: 30px; font-weight: 900; margin-top: 2px; }
+
+    .bigbtn {
+      width: 100%;
+      padding: 18px 16px;
+      border-radius: 18px;
+      border: 0;
+      background: linear-gradient(180deg, #2b7cff 0%, #1d5fe0 100%);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+    }
+    .bigbtn:active { transform: translateY(1px) scale(0.995); }
+
+    .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    input, textarea {
+      background:#0f0f0f; border:1px solid #2a2a2a; color:#f3f3f3;
+      border-radius: 12px; padding: 12px 12px; font-size: 16px;
+      outline: none;
+    }
+    input[type="number"] { width: 130px; font-weight: 800; }
+    textarea { width: 100%; min-height: 56px; resize: vertical; }
+    .muted { color:#bdbdbd; font-size: 12px; line-height: 1.35; }
+
+    .smallbtn {
+      padding: 12px 12px; border-radius: 12px;
+      border:1px solid #2a2a2a; background:#101010; color:#f3f3f3;
+      font-weight: 800; cursor:pointer; user-select:none;
+    }
+    .smallbtn:active { transform: translateY(1px); }
+    .right { margin-left:auto; }
+
+    .quick { display:flex; gap:10px; margin-top: 10px; }
+    .quick button { flex: 1; }
+
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #262626; font-size: 14px; }
+    th { text-align:left; color:#bdbdbd; font-weight: 800; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      background: rgba(20,20,20,0.92);
+      border: 1px solid #2a2a2a;
+      padding: 10px 12px;
+      border-radius: 999px;
+      color: #f3f3f3;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>Puff Tracker</h1>
+      <span class="pill" id="statusPill"><span class="dot"></span><span id="statusText">On track</span></span>
+      <span class="muted right">Target: <b id="targetLabel">300</b></span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Today’s Total</div>
+            <div class="value" id="todayTotal">0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Remaining</div>
+            <div class="value" id="remaining">0</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <button class="bigbtn" id="logBtn">LOG PUFF</button>
+          <div class="muted" style="margin-top:8px">
+            Logs <b id="defaultLabel">15</b> puff(s) with timestamp. Manual entry below.
+          </div>
+
+          <div class="quick">
+            <button class="smallbtn" data-add="5">+5</button>
+            <button class="smallbtn" data-add="15">+15</button>
+            <button class="smallbtn" data-add="20">+20</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="row">
+          <div class="muted">Custom</div>
+          <input id="puffsToAdd" type="number" min="1" step="1" value="15" />
+          <button class="smallbtn" id="logCustomBtn">Log amount</button>
+          <button class="smallbtn right" id="undoBtn" title="Removes last entry">Undo last</button>
+        </div>
+
+        <div style="margin-top:10px">
+          <div class="muted">Notes (optional)</div>
+          <textarea id="notes" placeholder="Trigger: driving, coffee, stress, boredom, etc."></textarea>
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <button class="smallbtn" id="exportBtn">Export CSV</button>
+          <button class="smallbtn" id="clearTodayBtn">Clear Today</button>
+          <button class="smallbtn" id="clearAllBtn">Clear All</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div class="muted" style="font-weight:900;">Settings</div>
+        </div>
+
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Daily Target</div>
+          <input id="target" type="number" min="1" step="1" value="300" />
+          <button class="smallbtn" id="saveTargetBtn">Save</button>
+        </div>
+
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Default Puffs (LOG PUFF)</div>
+          <input id="defaultPuffs" type="number" min="1" step="1" value="15" />
+          <button class="smallbtn" id="saveDefaultBtn">Save</button>
+        </div>
+
+        <div style="margin-top:14px" class="muted">
+          Data is stored locally on this iPhone. Export CSV periodically if you want a backup.
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="muted" style="font-weight:900;">Today’s Log (most recent first)</div>
+          <div style="margin-top:8px; max-height: 420px; overflow:auto;">
+            <table>
+              <thead>
+                <tr><th>Time</th><th>Puffs</th><th>Notes</th></tr>
+              </thead>
+              <tbody id="todayTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Logged</div>
+  <script src="app.js"></script>
+</body>
+</html>

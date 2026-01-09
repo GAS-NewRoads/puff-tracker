@@ -9,112 +9,74 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Puff Tracker</title>
-
   <style>
     :root { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; }
     body { margin: 0; background: #0b0b0b; color: #f3f3f3; -webkit-tap-highlight-color: transparent; }
-    .wrap { max-width: 860px; margin: 0 auto; padding: 16px; padding-bottom: 40px; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px; padding-bottom: 40px; }
     .topbar { display:flex; align-items:center; gap:10px; margin-bottom: 10px; }
     h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.2px; }
     .pill { display:inline-flex; align-items:center; gap:8px; padding: 6px 10px; border-radius: 999px; border:1px solid #2a2a2a; color:#cfcfcf; font-size: 12px; }
     .dot { width:8px; height:8px; border-radius:999px; background:#4ade80; }
     .pill.warn .dot { background:#fbbf24; }
     .pill.danger .dot { background:#f87171; }
-
     .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 860px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
-
+    @media (min-width: 980px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
     .card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 14px; }
     .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (min-width: 520px) { .kpis.k4 { grid-template-columns: 1fr 1fr 1fr 1fr; } }
     .kpi { background:#101010; border:1px solid #262626; border-radius:14px; padding: 12px; }
     .kpi .label { color:#bdbdbd; font-size: 12px; }
-    .kpi .value { font-size: 30px; font-weight: 900; margin-top: 2px; }
-
-    .bigbtn {
-      width: 100%;
-      padding: 18px 16px;
-      border-radius: 18px;
-      border: 0;
+    .kpi .value { font-size: 28px; font-weight: 900; margin-top: 2px; }
+    .bigbtn { width: 100%; padding: 18px 16px; border-radius: 18px; border: 0;
       background: linear-gradient(180deg, #2b7cff 0%, #1d5fe0 100%);
-      color: #fff;
-      font-size: 22px;
-      font-weight: 900;
-      cursor: pointer;
-      user-select: none;
-    }
+      color: #fff; font-size: 22px; font-weight: 900; cursor: pointer; user-select: none; }
     .bigbtn:active { transform: translateY(1px) scale(0.995); }
-
     .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
-    input, textarea {
-      background:#0f0f0f; border:1px solid #2a2a2a; color:#f3f3f3;
-      border-radius: 12px; padding: 12px 12px; font-size: 16px;
-      outline: none;
-    }
-    input[type="number"] { width: 130px; font-weight: 800; }
+    input, textarea { background:#0f0f0f; border:1px solid #2a2a2a; color:#f3f3f3;
+      border-radius: 12px; padding: 12px 12px; font-size: 16px; outline: none; }
+    input[type="number"] { width: 150px; font-weight: 800; }
+    input[type="url"] { width: 100%; }
     textarea { width: 100%; min-height: 56px; resize: vertical; }
     .muted { color:#bdbdbd; font-size: 12px; line-height: 1.35; }
-
-    .smallbtn {
-      padding: 12px 12px; border-radius: 12px;
-      border:1px solid #2a2a2a; background:#101010; color:#f3f3f3;
-      font-weight: 800; cursor:pointer; user-select:none;
-    }
+    .smallbtn { padding: 12px 12px; border-radius: 12px; border:1px solid #2a2a2a;
+      background:#101010; color:#f3f3f3; font-weight: 800; cursor:pointer; user-select:none; }
     .smallbtn:active { transform: translateY(1px); }
     .right { margin-left:auto; }
-
     .quick { display:flex; gap:10px; margin-top: 10px; }
     .quick button { flex: 1; }
-
     table { width:100%; border-collapse: collapse; }
     th, td { padding: 10px 8px; border-bottom: 1px solid #262626; font-size: 14px; }
     th { text-align:left; color:#bdbdbd; font-weight: 800; }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 18px;
-      background: rgba(20,20,20,0.92);
-      border: 1px solid #2a2a2a;
-      padding: 10px 12px;
-      border-radius: 999px;
-      color: #f3f3f3;
-      font-weight: 800;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 180ms ease;
-    }
+    .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 18px;
+      background: rgba(20,20,20,0.92); border: 1px solid #2a2a2a; padding: 10px 12px;
+      border-radius: 999px; color: #f3f3f3; font-weight: 800; opacity: 0; pointer-events: none;
+      transition: opacity 180ms ease; }
     .toast.show { opacity: 1; }
+    a { color: #8ab4ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hr { height:1px; background:#262626; margin: 12px 0; }
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="topbar">
       <h1>Puff Tracker</h1>
       <span class="pill" id="statusPill"><span class="dot"></span><span id="statusText">On track</span></span>
-      <span class="muted right">Target: <b id="targetLabel">300</b></span>
+      <span class="muted right">Target: <b id="targetLabel">300</b> puffs</span>
     </div>
 
     <div class="grid">
       <div class="card">
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Today’s Total</div>
-            <div class="value" id="todayTotal">0</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Remaining</div>
-            <div class="value" id="remaining">0</div>
-          </div>
+        <div class="kpis k4">
+          <div class="kpi"><div class="label">Today’s Puffs</div><div class="value" id="todayTotal">0</div></div>
+          <div class="kpi"><div class="label">Remaining Puffs</div><div class="value" id="remaining">0</div></div>
+          <div class="kpi"><div class="label">Cig Equiv Today</div><div class="value" id="cigEquiv">0.0</div></div>
+          <div class="kpi"><div class="label">Est. Nicotine (mg)</div><div class="value" id="nicMg">—</div></div>
         </div>
 
         <div style="margin-top:14px">
           <button class="bigbtn" id="logBtn">LOG PUFF</button>
-          <div class="muted" style="margin-top:8px">
-            Logs <b id="defaultLabel">15</b> puff(s) with timestamp. Manual entry below.
-          </div>
-
+          <div class="muted" style="margin-top:8px">Logs <b id="defaultLabel">15</b> puff(s) with timestamp. Manual entry below.</div>
           <div class="quick">
             <button class="smallbtn" data-add="5">+5</button>
             <button class="smallbtn" data-add="15">+15</button>
@@ -142,12 +104,10 @@
       </div>
 
       <div class="card">
-        <div class="row">
-          <div class="muted" style="font-weight:900;">Settings</div>
-        </div>
+        <div class="muted" style="font-weight:900;">Settings & References</div>
 
         <div style="margin-top:10px" class="row">
-          <div class="muted">Daily Target</div>
+          <div class="muted">Daily Target (puffs)</div>
           <input id="target" type="number" min="1" step="1" value="300" />
           <button class="smallbtn" id="saveTargetBtn">Save</button>
         </div>
@@ -158,20 +118,57 @@
           <button class="smallbtn" id="saveDefaultBtn">Save</button>
         </div>
 
-        <div style="margin-top:14px" class="muted">
-          Data is stored locally on this iPhone. Export CSV periodically if you want a backup.
+        <div class="hr"></div>
+
+        <div class="muted" style="font-weight:900;">Cigarette Equivalence</div>
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Puffs per cigarette (editable)</div>
+          <input id="puffsPerCig" type="number" min="1" step="1" value="20" />
+          <button class="smallbtn" id="saveEquivBtn">Save</button>
+          <button class="smallbtn" id="setTargetFromCigsBtn" title="Sets daily puff target = cigs/day × puffs/cig">Use cigs/day</button>
+        </div>
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Cigarettes per day baseline</div>
+          <input id="cigsPerDay" type="number" min="0" step="1" value="15" />
+          <button class="smallbtn" id="saveCigsBtn">Save</button>
+        </div>
+        <div class="muted" style="margin-top:8px">This is a personal calibration knob. Cigarettes and vapes do not deliver nicotine consistently; use it as a tracking reference.</div>
+
+        <div class="hr"></div>
+
+        <div class="muted" style="font-weight:900;">Nicotine Concentration (for taper math)</div>
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Nicotine strength (mg/mL)</div>
+          <input id="nicStrength" type="number" min="0" step="0.1" value="0" />
+          <button class="smallbtn" id="saveNicBtn">Save</button>
+        </div>
+        <div style="margin-top:10px" class="row">
+          <div class="muted">Estimated mL per puff (optional)</div>
+          <input id="mlPerPuff" type="number" min="0" step="0.0001" value="0" />
+          <button class="smallbtn" id="saveMlBtn">Save</button>
+        </div>
+        <div class="muted" style="margin-top:8px">If both values are set above zero, the app estimates nicotine mg/day as: puffs × (mL/puff) × (mg/mL).</div>
+
+        <div class="hr"></div>
+
+        <div class="muted" style="font-weight:900;">Google Sheet Reference (optional)</div>
+        <div class="muted" style="margin-top:8px">Paste your Google Sheet share link below (view-only is fine). The app stays local; this is just a reference link.</div>
+        <div style="margin-top:10px">
+          <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/..." />
+          <div class="row" style="margin-top:10px">
+            <button class="smallbtn" id="saveSheetBtn">Save Link</button>
+            <a class="right" id="sheetLink" href="#" target="_blank" rel="noreferrer">Open Sheet</a>
+          </div>
         </div>
 
-        <div style="margin-top:14px">
-          <div class="muted" style="font-weight:900;">Today’s Log (most recent first)</div>
-          <div style="margin-top:8px; max-height: 420px; overflow:auto;">
-            <table>
-              <thead>
-                <tr><th>Time</th><th>Puffs</th><th>Notes</th></tr>
-              </thead>
-              <tbody id="todayTable"></tbody>
-            </table>
-          </div>
+        <div class="hr"></div>
+
+        <div class="muted" style="font-weight:900;">Today’s Log</div>
+        <div style="margin-top:8px; max-height: 320px; overflow:auto;">
+          <table>
+            <thead><tr><th>Time</th><th>Puffs</th><th>Notes</th></tr></thead>
+            <tbody id="todayTable"></tbody>
+          </table>
         </div>
       </div>
     </div>

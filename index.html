@@ -1,16 +1,65 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Puff Tracker</title></head><body>
-<h2>Session Mode</h2>
-<div id="sessionCount">0</div>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Puff Tracker</title>
+<style>
+body{font-family:-apple-system,system-ui;background:#0b0b0b;color:#fff;margin:0;padding:16px}
+.card{background:#141414;border:1px solid #333;border-radius:12px;padding:12px;margin-bottom:12px}
+button{padding:12px;border-radius:10px;border:0;font-size:16px}
+.primary{background:#2b7cff;color:#fff}
+.secondary{background:#222;color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.big{font-size:32px;font-weight:900}
+</style>
+</head>
+<body>
+
+<h2>Puff Tracker (Merged)</h2>
+
+<div class="card">
+<h3>Today</h3>
+<div class="big" id="todayTotal">0</div>
+<div>Target: <span id="targetLabel">300</span></div>
+</div>
+
+<div class="card">
+<h3>Session Mode</h3>
+<div class="big" id="sessionCount">0</div>
 <div id="sessionState">No active session</div>
-<button id="startSessionBtn">Start</button>
-<button id="hitBtn">+1</button>
-<button id="endBtn">End</button>
-<button id="cancelBtn">Cancel</button>
-<h3>Auto End (minutes)</h3>
-<input id="autoEndMinutes" type="number" value="5">
-<button id="saveAutoBtn">Save</button>
-<div id="toast"></div>
+<div class="row">
+<button class="secondary" id="startBtn">Start Session</button>
+<button class="primary" id="hitBtn">+1 Hit</button>
+</div>
+<div class="row" style="margin-top:8px">
+<button class="primary" id="endBtn">End & Log</button>
+<button class="secondary" id="cancelBtn">Cancel</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Settings</h3>
+<div>
+Auto-end minutes:
+<input id="autoEnd" type="number" value="5" style="width:60px"/>
+<button id="saveAuto">Save</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Quick Add</h3>
+<div class="row">
+<button onclick="quickAdd(5)">+5</button>
+<button onclick="quickAdd(15)">+15</button>
+<button onclick="quickAdd(20)">+20</button>
+</div>
+</div>
+
+<div class="card">
+<button onclick="exportCSV()">Export CSV</button>
+</div>
+
 <script src="app.js"></script>
-</body></html>
+</body>
+</html>
